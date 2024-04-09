@@ -1,21 +1,21 @@
-import { render } from "@react-email/render";
-import nodemailer from "nodemailer";
-import QRCode from "qrcode";
-import PDFDocument from "pdfkit";
-import fs from "fs";
-import lorem from "lorem-ipsum";
+import { render } from '@react-email/render'
+import nodemailer from 'nodemailer'
+import QRCode from 'qrcode'
+import PDFDocument from 'pdfkit'
+import fs from 'fs'
+import lorem from 'lorem-ipsum'
 // import pkg from "../../client/src/pages/email.jsx";
-import db from "../models/index.js";
-import { secret } from "../config/auth.config.js";
-const User = db.users;
-const Role = db.role;
-const UserDetails = db.userDetails;
+import db from '../models/index.js'
+import { secret } from '../config/auth.config.js'
+const User = db.users
+const Role = db.role
+const UserDetails = db.userDetails
 
-const Op = db.Sequelize.Op;
+const Op = db.Sequelize.Op
 
-const doc = new PDFDocument();
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
+const doc = new PDFDocument()
+import jwt from 'jsonwebtoken'
+import bcrypt from 'bcryptjs'
 
 const signup = async (req, res) => {
   // Save User to Database
@@ -32,9 +32,9 @@ const signup = async (req, res) => {
     });
     if (user_details) res.send({ message: "Registered successfully!" });
   } catch (error) {
-    res.status(500).send({ message: error.message });
+    res.status(500).send({ message: error.message })
   }
-};
+}
 
 const signin = async (req, res) => {
   try {
@@ -42,21 +42,18 @@ const signin = async (req, res) => {
       where: {
         email: req.body.email,
       },
-    });
+    })
 
     if (!user) {
-      return res.status(404).send({ message: "User Not found." });
+      return res.status(404).send({ message: 'User Not found.' })
     }
 
-    const passwordIsValid = bcrypt.compareSync(
-      req.body.password,
-      user.password
-    );
+    const passwordIsValid = bcrypt.compareSync(req.body.password, user.password)
 
     if (!passwordIsValid) {
       return res.status(401).send({
-        message: "Invalid Password!",
-      });
+        message: 'Invalid Password!',
+      })
     }
 
     const token = jwt.sign({ id: user.id }, secret, {
@@ -74,42 +71,42 @@ const signin = async (req, res) => {
       created: user.createAt,
       roles: role,
       token: token,
-      message: "Sign In Successfully",
-    });
+      message: 'Sign In Successfully',
+    })
   } catch (error) {
-    return res.status(500).send({ message: error.message });
+    return res.status(500).send({ message: error.message })
   }
-};
+}
 
 const signout = async (req, res) => {
   try {
-    req.session = null;
+    req.session = null
     return res.status(200).send({
       message: "You've been signed out!",
-    });
+    })
   } catch (err) {
-    this.next(err);
+    this.next(err)
   }
-};
+}
 
 const sendEmail = async (req, res) => {
   const transporter = nodemailer.createTransport({
-    service: "gmail",
-    host: "smtp.gmail.com",
+    service: 'gmail',
+    host: 'smtp.gmail.com',
     port: 587,
     secure: false,
     auth: {
       user: process.env.EMAIL,
       pass: process.env.EMAIL_PASS,
     },
-  });
+  })
 
   // const emailHtml = render(Email({ url: "https://example.com" }));
 
   const options = {
     from: process.env.EMAIL,
-    to: "nicsonsoh.sdh@gmail.com",
-    subject: "Testing Node JS sending Email",
+    to: 'nicsonsoh.sdh@gmail.com',
+    subject: 'Testing Node JS sending Email',
     // text: "Dear Recipient, thanks for subscribing",
     html: `<!DOCTYPE html>
     <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -206,82 +203,82 @@ const sendEmail = async (req, res) => {
     </html>`,
     attachments: [
       {
-        filename: "qrcode.pdf",
-        path: "app/pdf/file.pdf",
+        filename: 'qrcode.pdf',
+        path: 'app/pdf/file.pdf',
       },
     ],
-  };
+  }
 
   transporter.sendMail(options, (error, info) => {
     if (error) {
-      console.log(error);
-      res.json({ yo: "error" });
-      res.sendStatus(500);
+      console.log(error)
+      res.json({ yo: 'error' })
+      res.sendStatus(500)
     } else {
-      console.log("Message sent: " + info.response);
-      res.sendStatus(200);
+      console.log('Message sent: ' + info.response)
+      res.sendStatus(200)
     }
-    return res.status(200).end();
-  });
-};
+    return res.status(200).end()
+  })
+}
 
 const qrCode = async (req, res) => {
   QRCode.toFile(
-    "app/qrcode/" + "haha" + "filename.png",
-    "http://10.13.3.110:3000",
+    'app/qrcode/' + 'haha' + 'filename.png',
+    'http://10.13.3.110:3306',
     {
       color: {
-        dark: "#000", // Black Dots
-        light: "#FFF", // White Background
+        dark: '#000', // Black Dots
+        light: '#FFF', // White Background
       },
     },
     function (err) {
       if (err) {
-        res.sendStatus(500);
-        throw err;
+        res.sendStatus(500)
+        throw err
       }
-      console.log("done");
-      res.sendStatus(200);
+      console.log('done')
+      res.sendStatus(200)
     }
-  );
-};
+  )
+}
 
 const createPDF = async (req, res) => {
-  generateHeader(doc); // Invoke `generateHeader` function.
-  generateFooter(doc); // Invoke `generateFooter` function.
+  generateHeader(doc) // Invoke `generateHeader` function.
+  generateFooter(doc) // Invoke `generateFooter` function.
 
   // finalize the PDF and end the stream
-  doc.end();
-  doc.pipe(fs.createWriteStream("app/pdf/file.pdf")); // write to PDF
+  doc.end()
+  doc.pipe(fs.createWriteStream('app/pdf/file.pdf')) // write to PDF
   // doc.pipe(res); // HTTP response
 
   // add stuff to PDF here using methods described below...
 
-  res.sendStatus(200);
+  res.sendStatus(200)
 
   function generateHeader(doc) {
     doc
-      .image("app/qrcode/filename.png", 50, 45, { width: 50 })
-      .fillColor("#444444")
+      .image('app/qrcode/filename.png', 50, 45, { width: 50 })
+      .fillColor('#444444')
       .fontSize(20)
-      .text("ACME Inc.", 110, 57)
+      .text('ACME Inc.', 110, 57)
       .fontSize(10)
-      .text("123 Main Street", 200, 65, { align: "right" })
-      .text("New York, NY, 10025", 200, 80, { align: "right" })
-      .moveDown();
+      .text('123 Main Street', 200, 65, { align: 'right' })
+      .text('New York, NY, 10025', 200, 80, { align: 'right' })
+      .moveDown()
   }
 
   function generateFooter(doc) {
     doc
       .fontSize(10)
       .text(
-        "Payment is due within 15 days. Thank you for your business.",
+        'Payment is due within 15 days. Thank you for your business.',
         50,
         580,
-        { align: "center", width: 650 }
-      );
+        { align: 'center', width: 650 }
+      )
   }
-};
+}
 
 export default {
   signup,
@@ -290,4 +287,4 @@ export default {
   sendEmail,
   qrCode,
   createPDF,
-};
+}
