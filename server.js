@@ -5,8 +5,11 @@ import db from './app/models/index.js'
 import authRoute from './app/routes/auth.route.js'
 import userRoute from './app/routes/user.route.js'
 import cookieSession from 'cookie-session'
+import giftRoute from './app/routes/gift.route.js'
 const app = express()
 const Role = db.role
+const Room = db.rooms
+const Gift = db.gifts
 
 const whitelist = ['http://localhost:3306/', 'http://localhost:3080/']
 var corsOptions = {
@@ -35,6 +38,8 @@ app.use(
 //routing below
 authRoute(app)
 userRoute(app)
+giftRoute(app)
+
 app.get('/', cors(), (req, res) => {
   res.json({ message: 'Welcome to Best Application.' })
 })
@@ -47,6 +52,7 @@ app.get('/express_backend', (req, res) => {
 db.sequelize.sync().then(() => {
   console.log('Sync db.')
   //initial() //please uncommend at first initialize
+  //mockedLuckyDrawData() // mocked data for testing lucky draw
 })
 
 function initial() {
@@ -64,6 +70,47 @@ function initial() {
     id: 3,
     name: 'admin',
   })
+}
+
+async function mockedLuckyDrawData() {
+  try {
+    const [room, created] = await Room.findOrCreate({
+      where: { name: 'Huawei Event free gifts 666' },
+      defaults: {
+        name: 'Huawei Event free gifts 666',
+        isActive: true,
+      },
+    })
+
+    if (created) {
+      console.log('Room created with id:', room.id)
+
+      Gift.create({
+        name: 'Huawei Earbud',
+        likelihood: 2.5,
+        quantity: 5,
+        roomId: room.id,
+      })
+
+      Gift.create({
+        name: 'Huawei Hairband',
+        likelihood: 5.7,
+        quantity: 5,
+        roomId: room.id,
+      })
+
+      Gift.create({
+        name: 'Huawei Lipstick',
+        likelihood: 8.3,
+        quantity: 5,
+        roomId: room.id,
+      })
+    } else {
+      console.log('Room already exists with id:', room.id)
+    }
+  } catch (error) {
+    console.error('Error creating mocked data:', error)
+  }
 }
 
 //set port
