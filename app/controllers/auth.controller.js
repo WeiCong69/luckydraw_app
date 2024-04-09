@@ -25,26 +25,12 @@ const signup = async (req, res) => {
       lastname: req.body.lastname,
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 8),
+      roleId: req.body?.roles ? req.body?.roles : null,
     });
-    const user_details = await UserDetails.create();
-    if (req.body.roles) {
-      const roles = await Role.findAll({
-        where: {
-          name: {
-            [Op.or]: req.body.roles,
-          },
-        },
-      });
-
-      const result = user.setRoles(roles);
-      user.setUserDetails(user_details);
-      if (result) res.send({ message: "Registered successfully!" });
-    } else {
-      // user has role = 1
-      const result = user.setRoles([1]);
-      user.setUserDetails(user_details);
-      if (result) res.send({ message: "Registered successfully!" });
-    }
+    const user_details = await UserDetails.create({
+      userId: user.id
+    });
+    if (user_details) res.send({ message: "Registered successfully!" });
   } catch (error) {
     res.status(500).send({ message: error.message });
   }

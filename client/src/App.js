@@ -1,5 +1,5 @@
 import "./App.css";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route,Navigate } from "react-router-dom";
 import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -26,9 +26,10 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        {isLoggedIn === true ? (
+        {isLoggedIn ? (
           <>
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/profile" element={<Profile />} /> 
           </>
         ) : (
           <>
@@ -42,7 +43,7 @@ function App() {
             <Route path="/form_g1" element={<FormSample />} />
           </>
         ) : null}
-        <Route path="/" element={<Home />} />
+        {!isLoggedIn && <Route path="*" element={<Navigate to="/login" />} />}
         <Route path="*" element={<PageNotFound />} />
       </Routes>
       <AuthVerify logOut={logOut} />

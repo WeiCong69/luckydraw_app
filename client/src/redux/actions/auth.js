@@ -84,7 +84,6 @@ export const login = (username, password) => async (dispatch) => {
 
 export const logout = () => (dispatch) => {
   AuthService.logout();
-
   dispatch({
     type: LOGOUT,
   });

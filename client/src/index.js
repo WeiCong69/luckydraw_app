@@ -30,7 +30,7 @@ root.render(
         <PersistGate loading={null} persistor={persistor}>
           <Router>
             <Navbar />
-            <App />
+              <App />
             <Footer />
           </Router>
         </PersistGate>
