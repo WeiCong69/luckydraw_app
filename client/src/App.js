@@ -37,7 +37,7 @@ function App() {
             <Route path="/signup" element={<SignUp />} />
           </>
         )}
-        {user?.roles?.includes("ROLE_ADMIN") ? (
+        {user?.roles === 3 ? (
           <>
             <Route path="/user/list" element={<UserTable />} />
             <Route path="/form_g1" element={<FormSample />} />

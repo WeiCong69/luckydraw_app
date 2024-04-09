@@ -41,13 +41,8 @@ const updateProfile = async (req, res) => {
       lastname: request.lastname,
     });
     const token = req.session.token;
-    let authorities = [];
-    const roles = await user.getRoles();
-    for (let i = 0; i < roles.length; i++) {
-      authorities.push("ROLE_" + roles[i].name.toUpperCase());
-    }
-    // console.log("fuck", user);
-    const data = { message: "Update Successfully", user, token, authorities };
+    const role =  user.userId;
+    const data = { message: "Update Successfully", user, token, role };
     res.status(200).send(data);
   } catch (error) {
     return res.status(500).send({ message: error.message });

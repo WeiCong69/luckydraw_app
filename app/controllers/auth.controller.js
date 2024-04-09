@@ -25,7 +25,7 @@ const signup = async (req, res) => {
       lastname: req.body.lastname,
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 8),
-      roleId: req.body?.roles ? req.body?.roles : null,
+      roleId: req.body?.roles ? req.body?.roles : 1, //default 1 is user role
     });
     const user_details = await UserDetails.create({
       userId: user.id
@@ -63,13 +63,7 @@ const signin = async (req, res) => {
       expiresIn: 18000, //5 hours
       //expiresIn: 86400, // 24 hours
     });
-
-    let authorities = [];
-    const roles = await user.getRoles();
-    for (let i = 0; i < roles.length; i++) {
-      authorities.push("ROLE_" + roles[i].name.toUpperCase());
-    }
-
+    const role = await user.roleId;
     req.session.token = token;
 
     return res.status(200).send({
@@ -78,7 +72,7 @@ const signin = async (req, res) => {
       lastname: user.lastname,
       email: user.email,
       created: user.createAt,
-      roles: authorities,
+      roles: role,
       token: token,
       message: "Sign In Successfully",
     });

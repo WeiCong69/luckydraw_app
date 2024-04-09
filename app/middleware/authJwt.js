@@ -26,12 +26,9 @@ function verifyToken(req, res, next) {
 async function isAdmin(req, res, next) {
   try {
     const user = await User.findByPk(req.userId);
-    const roles = await user.getRoles();
-
-    for (let i = 0; i < roles.length; i++) {
-      if (roles[i].name === "admin") {
-        return next();
-      }
+    const role = await user.roleId;
+    if (role === 3) {
+      return next();
     }
 
     return res.status(403).send({
@@ -47,12 +44,9 @@ async function isAdmin(req, res, next) {
 async function isModerator(req, res, next) {
   try {
     const user = await User.findByPk(req.userId);
-    const roles = await user.getRoles();
-
-    for (let i = 0; i < roles.length; i++) {
-      if (roles[i].name === "moderator") {
-        return next();
-      }
+    const role = await user.roleId;
+    if (role === 2) {
+      return next();
     }
 
     return res.status(403).send({
@@ -68,16 +62,9 @@ async function isModerator(req, res, next) {
 async function isModeratorOrAdmin(req, res, next) {
   try {
     const user = await User.findByPk(req.userId);
-    const roles = await user.getRoles();
-
-    for (let i = 0; i < roles.length; i++) {
-      if (roles[i].name === "moderator") {
-        return next();
-      }
-
-      if (roles[i].name === "admin") {
-        return next();
-      }
+    const role = await user.roleId;
+    if (role === 2 || role === 3) {
+      return next();
     }
 
     return res.status(403).send({

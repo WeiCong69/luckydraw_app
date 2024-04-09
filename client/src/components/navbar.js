@@ -47,7 +47,7 @@ export default function WithSubnavigation() {
     await dispatch(logout());
     navigate("/");
   };
-  const nav_items = user?.roles?.includes("ROLE_ADMIN")
+  const nav_items = user?.role === 3
     ? [
         {
           label: "Inspiration",

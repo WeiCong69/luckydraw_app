@@ -127,9 +127,9 @@ export default function UserTable() {
                 <Th w="110px">First Name</Th>
                 <Th w="110px">Last Name</Th>
                 <Th>Email</Th>
-                <Th>Data</Th>
+                {/* <Th>Data</Th> */}
                 <Th>Remark</Th>
-                <Th>Details</Th>
+                {/* <Th>Details</Th> */}
               </Tr>
             </Thead>
             <Tbody>
@@ -139,9 +139,9 @@ export default function UserTable() {
                   <Td>{item.firstname}</Td>
                   <Td>{item.lastname}</Td>
                   <Td>{item.email}</Td>
-                  <Td>{item?.userDetails[0].createdAt}</Td>
+                  {/* <Td>{item?.userDetails[0].createdAt}</Td> */}
                   <Td>{item.remark}</Td>
-                  <Td>{item?.userDetails[0].details}</Td>
+                  {/* <Td>{item?.userDetails[0].details}</Td> */}
                 </Tr>
               ))}
             </Tbody>
