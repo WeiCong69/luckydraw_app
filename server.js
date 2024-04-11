@@ -1,4 +1,8 @@
 import express, { urlencoded } from 'express'
+import { createClient } from 'redis'
+import { createServer } from 'http'
+import { Server } from 'socket.io'
+import { createAdapter } from '@socket.io/redis-adapter'
 import cors from 'cors'
 import { config } from 'dotenv'
 import db from './app/models/index.js'
@@ -6,12 +10,19 @@ import authRoute from './app/routes/auth.route.js'
 import userRoute from './app/routes/user.route.js'
 import cookieSession from 'cookie-session'
 import giftRoute from './app/routes/gift.route.js'
+
 const app = express()
+const server = createServer(app)
+
 const Role = db.role
 const Room = db.rooms
 const Gift = db.gifts
 
-const whitelist = ['http://localhost:3306/', 'http://localhost:3080/']
+const whitelist = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://localhost:3080',
+]
 var corsOptions = {
   origin: (origin, callback) => {
     if (whitelist.includes(origin) || !origin) {
@@ -22,6 +33,42 @@ var corsOptions = {
     }
   },
 }
+
+const io = new Server(server, {
+  cors: {
+    credentials: true,
+    origin: whitelist,
+  },
+  maxHttpBufferSize: 1e8,
+})
+
+io.on('connection', (socket) => {
+  console.log('A new client connected')
+
+  socket.on('subscribe', (channel) => {
+    console.log(`Subscribing to channel: ${channel}`)
+    socket.join(channel)
+  })
+
+  socket.on('unsubscribe', (channel) => {
+    console.log(`Unsubscribing from channel: ${channel}`)
+    socket.leave(channel)
+  })
+
+  socket.on('send', function (channel, message) {
+    console.log(`sending message from ${channel} => ${message}`)
+    io.to(channel).emit('message', message)
+  })
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected')
+  })
+
+  socket.on('message', function (message) {
+    console.log('received message:', message)
+  })
+})
+
 config()
 
 app.use(cors(corsOptions))
@@ -114,6 +161,22 @@ async function mockedLuckyDrawData() {
 }
 
 //set port
-const port = process.env.SERVER_PORT || 3080
+
 // This displays message that the server running and listening to specified port
-app.listen(port, () => console.log(`Listening on port ${port}`)) //Line 6
+// app.listen(port, () => console.log(`Listening on port ${port}`))   //Line 6
+
+;(async () => {
+  const pubClient = createClient({ url: 'redis://localhost:6379' }) // Add your Redis URL here
+  const subClient = pubClient.duplicate()
+
+  await Promise.all([pubClient.connect(), subClient.connect()])
+
+  io.adapter(createAdapter(pubClient, subClient))
+
+  const port = process.env.SERVER_PORT || 3080
+  server.listen(port, () => {
+    console.log(`Listening on port ${port}`)
+  })
+})()
+
+io.to('channel1').emit('send', 'Hello from server side')
