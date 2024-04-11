@@ -42,6 +42,7 @@ const io = new Server(server, {
   maxHttpBufferSize: 1e8,
 })
 
+//https://medium.com/@techWithAditya/mastering-real-time-communication-an-in-depth-guide-to-implementing-pub-sub-patterns-in-node-js-8a3ccc05d150
 io.on('connection', (socket) => {
   console.log('A new client connected')
 
