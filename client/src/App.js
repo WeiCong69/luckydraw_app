@@ -59,12 +59,12 @@ const App = () => {
   useEffect(() => {
     const socket = io('http://localhost:3080') // Replace with your Socket.IO server URL
 
-    socket.emit('subscribe', 'channel1')
     // Listen for messages on the 'channel1' channel
-    socket.on('message', (data) => {
-      setMessage(data)
-      console.log(data)
+    socket.on('message', (message) => {
+      console.log('Received message from server:', message)
     })
+
+    socket.emit('subscribe', 'channel1')
 
     socket.emit('send', 'channel-1', 'Hello from client side')
   }, [])

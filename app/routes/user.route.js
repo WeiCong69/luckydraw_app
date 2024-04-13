@@ -36,4 +36,10 @@ export default function (app) {
     [middleware.authJwt.verifyToken, middleware.authJwt.isAdmin],
     user.showAllUser
   );
+
+  app.get(
+    '/users',
+    [middleware.authJwt.verifyToken, middleware.authJwt.isAdmin],
+    user.getAllUser
+  )
 }
