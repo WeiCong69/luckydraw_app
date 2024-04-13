@@ -62,11 +62,12 @@ const App = () => {
     // Listen for messages on the 'channel1' channel
     socket.on('message', (message) => {
       console.log('Received message from server:', message)
+      setMessage(message)
     })
 
-    socket.emit('subscribe', 'channel1')
+    socket.emit('subscribe', 'channel-1')
 
-    socket.emit('send', 'channel-1', 'Hello from client side')
+    // socket.emit('send', 'channel-1', 'Hello from client side')
   }, [])
 
   return (

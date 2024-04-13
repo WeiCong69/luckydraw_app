@@ -38,11 +38,12 @@ const socketHandler = (server, whitelist) => {
     })
   })
 
-  const sendToChannel = (channel, message) => {
+  const publishMessage = (channel, message) => {
     io.to(channel).emit('message', message)
+    console.log(channel, message)
   }
 
-  return { io, sendToChannel }
+  return { io, publishMessage }
 }
 
 export default socketHandler

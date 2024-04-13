@@ -1,7 +1,7 @@
 import LuckyDrawResponseDTO from '../DTOs/luckyDrawResponseDTO.js'
 import db from '../models/index.js'
 import Sequelize from 'sequelize'
-import socketHandler from '../../socketHandler.js'
+import { io, publishMessage } from '../../server.js'
 
 const Gift = db.gifts
 
@@ -59,9 +59,12 @@ const luckyDraw = async (req, res) => {
         })
       )
 
-      socketHandler.io
-        .to('channel-1')
-        .emit('message', 'hello froms server side')
+      publishMessage(
+        'channel-1',
+        new LuckyDrawResponseDTO({
+          gifts: selectedGift,
+        })
+      )
     } else {
       res.status(200).json(
         new LuckyDrawResponseDTO({
