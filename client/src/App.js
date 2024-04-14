@@ -56,18 +56,29 @@ import io from 'socket.io-client'
 const App = () => {
   const [message, setMessage] = useState('')
 
+  let latestMessageSequence = -1
   useEffect(() => {
     const socket = io('http://localhost:3080') // Replace with your Socket.IO server URL
 
-    // Listen for messages on the 'channel1' channel
     socket.on('message', (message) => {
-      console.log('Received message from server:', message)
-      setMessage(message)
+      console.log('message seq', message.sequence)
+      if (message.sequence > latestMessageSequence) {
+        latestMessageSequence = message.sequence
+        console.log('Received message from server:', message, message.sequence)
+        processMessage(message)
+      }
     })
 
     socket.emit('subscribe', 'channel-1')
 
-    // socket.emit('send', 'channel-1', 'Hello from client side')
+    function processMessage(message) {
+      console.log('Message processed:', message)
+      setTimeout(() => {
+        // Emit acknowledgment to the server
+        socket.emit('acknowledge')
+        console.log('Acknowledgment sent after 3 seconds')
+      }, 3000)
+    }
   }, [])
 
   return (

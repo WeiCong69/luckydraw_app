@@ -3,6 +3,8 @@ import { Server } from 'socket.io'
 //https://medium.com/@techWithAditya/mastering-real-time-communication-an-in-depth-guide-to-implementing-pub-sub-patterns-in-node-js-8a3ccc05d150
 
 const socketHandler = (server, whitelist) => {
+  let messageSequence = 0
+  let isAcknowledged = true
   const io = new Server(server, {
     cors: {
       credentials: true,
@@ -27,6 +29,12 @@ const socketHandler = (server, whitelist) => {
     socket.on('send', function (channel, message) {
       console.log(`sending message from ${channel} => ${message}`)
       io.to(channel).emit('message', message)
+      isAcknowledged = false
+    })
+
+    socket.on('acknowledge', () => {
+      console.log('Message acknowledged by client')
+      isAcknowledged = true
     })
 
     socket.on('disconnect', () => {
@@ -39,11 +47,11 @@ const socketHandler = (server, whitelist) => {
   })
 
   const publishMessage = (channel, message) => {
-    io.to(channel).emit('message', message)
+    io.to(channel).emit('message', { sequence: messageSequence++, message })
     console.log(channel, message)
   }
 
-  return { io, publishMessage }
+  return { io, publishMessage, isAcknowledged }
 }
 
 export default socketHandler

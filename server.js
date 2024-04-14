@@ -19,7 +19,7 @@ const whitelist = [
 
 const app = express()
 const server = createServer(app)
-const { io, publishMessage } = socketHandler(server, whitelist) // Assuming `whitelist` is defined
+const { io, publishMessage, isAcknowledged } = socketHandler(server, whitelist) // Assuming `whitelist` is defined
 
 const Role = db.role
 const Room = db.rooms
@@ -127,11 +127,6 @@ async function mockedLuckyDrawData() {
   }
 }
 
-//set port
-
-// This displays message that the server running and listening to specified port
-// app.listen(port, () => console.log(`Listening on port ${port}`))   //Line 6
-export { io, publishMessage }
 ;(async () => {
   const pubClient = createClient({ url: 'redis://localhost:6379' }) // Add your Redis URL here
   const subClient = pubClient.duplicate()
@@ -145,3 +140,5 @@ export { io, publishMessage }
     console.log(`Listening on port ${port}`)
   })
 })()
+
+export { io, publishMessage, isAcknowledged }
