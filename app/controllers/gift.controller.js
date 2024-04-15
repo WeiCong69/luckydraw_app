@@ -1,73 +1,86 @@
 import LuckyDrawResponseDTO from '../DTOs/luckyDrawResponseDTO.js'
 import db from '../models/index.js'
 import Sequelize from 'sequelize'
+import { publishMessage, isAcknowledged } from '../../server.js'
 
 const Gift = db.gifts
 
-const luckyDraw = async (req, res) => {
+const performLuckyDraw = async (roomId) => {
+  const gifts = await Gift.findAll({
+    where: { roomId, quantity: { [Sequelize.Op.gt]: 0 } },
+  })
+
+  return gifts.length > 0 ? gifts : null
+}
+
+const updateGiftQuantity = async (selectedGift) => {
+  await Gift.update(
+    { quantity: selectedGift.quantity - 1 },
+    { where: { id: selectedGift.id } }
+  )
+}
+
+const processLuckyDraw = async (req) => {
   try {
-    const gifts = await Gift.findAll({
-      where: { roomId: req.body.roomId, quantity: { [Sequelize.Op.gt]: 1 } },
-    })
+    const gifts = await performLuckyDraw(req.body.roomId)
 
-    if (gifts.length === 0) {
-      return res.status(200).json(
-        new LuckyDrawResponseDTO({
-          error: 'No gifts in prize pool.',
-        })
+    if (gifts) {
+      const totalLikelihood = gifts.reduce(
+        (acc, gift) => acc + gift.likelihood,
+        0
       )
-    }
+      const randomNumber = Math.random() * totalLikelihood
 
-    // Calculate the total likelihood of winning
-    const totalLikelihood = gifts.reduce(
-      (acc, gift) => acc + gift.likelihood,
-      0
-    )
-
-    // Generate a random number between 0 and totalLikelihood
-    const randomNumber = Math.random() * totalLikelihood
-
-    // Find the gift based on the random number and likelihood
-    const selectedGift = gifts.reduce(
-      (acc, gift) => {
-        // If selectedGift is not yet found and randomNumber is less than or equal to cumulativeProbability
-        if (
-          !acc.selectedGift &&
-          randomNumber <= acc.cumulativeProbability + gift.likelihood
-        ) {
-          return {
-            cumulativeProbability: acc.cumulativeProbability + gift.likelihood,
-            selectedGift: gift,
+      const selectedGift = gifts.reduce(
+        (acc, gift) => {
+          if (
+            !acc.selectedGift &&
+            randomNumber <= acc.cumulativeProbability + gift.likelihood
+          ) {
+            return {
+              cumulativeProbability:
+                acc.cumulativeProbability + gift.likelihood,
+              selectedGift: gift,
+            }
           }
-        }
-        // Otherwise, return the accumulator as it is
-        return acc
-      },
-      { cumulativeProbability: 0, selectedGift: null }
-    ).selectedGift
+          return acc
+        },
+        { cumulativeProbability: 0, selectedGift: null }
+      ).selectedGift
 
-    if (selectedGift) {
-      await Gift.update(
-        { quantity: selectedGift.quantity - 1 },
-        { where: { id: selectedGift.id } }
-      )
-
-      res.status(200).json(
-        new LuckyDrawResponseDTO({
-          gifts: selectedGift,
-        })
-      )
+      if (selectedGift) {
+        await updateGiftQuantity(selectedGift)
+        return new LuckyDrawResponseDTO({ gifts: selectedGift })
+      } else {
+        return new LuckyDrawResponseDTO({ error: 'Better luck next time!' })
+      }
     } else {
-      res.status(200).json(
-        new LuckyDrawResponseDTO({
-          error: 'Better luck next time!',
-        })
-      )
+      return null // No gifts in prize pool
     }
   } catch (error) {
     console.error('Error during lucky draw:', error)
-    res.status(500).json(new LuckyDrawResponseDTO({ error: error }))
+    return new LuckyDrawResponseDTO({ error })
   }
+}
+
+const luckyDraw = async (req, res) => {
+  let result = null
+
+  if (!isAcknowledged) {
+    result = new LuckyDrawResponseDTO({
+      error: 'Previous message has not been acknowledged',
+    })
+  } else {
+    result = await processLuckyDraw(req)
+
+    if (!result) {
+      // No gifts in prize pool
+      result = new LuckyDrawResponseDTO({ error: 'No gifts in prize pool.' })
+    }
+  }
+
+  publishMessage('channel-1', result)
+  res.status(result.error ? 200 : 500).json(result)
 }
 
 export default {

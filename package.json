@@ -14,6 +14,7 @@
     "@react-email/button": "^0.0.9",
     "@react-email/html": "0.0.4",
     "@react-email/render": "^0.0.7",
+    "@socket.io/redis-adapter": "^8.3.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "cookie-session": "^2.0.0",
@@ -33,6 +34,8 @@
     "qrcode": "^1.5.3",
     "redis": "^4.6.13",
     "sequelize": "^6.31.0",
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5",
     "ws": "^8.13.0"
   },
   "rules": {

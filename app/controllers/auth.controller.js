@@ -26,11 +26,11 @@ const signup = async (req, res) => {
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 8),
       roleId: req.body?.roles ? req.body?.roles : 1, //default 1 is user role
-    });
+    })
     const user_details = await UserDetails.create({
-      userId: user.id
-    });
-    if (user_details) res.send({ message: "Registered successfully!" });
+      userId: user.id,
+    })
+    if (user_details) res.send({ message: 'Registered successfully!' })
   } catch (error) {
     res.status(500).send({ message: error.message })
   }
@@ -59,9 +59,9 @@ const signin = async (req, res) => {
     const token = jwt.sign({ id: user.id }, secret, {
       expiresIn: 18000, //5 hours
       //expiresIn: 86400, // 24 hours
-    });
-    const role = await user.roleId;
-    req.session.token = token;
+    })
+    const role = await user.roleId
+    req.session.token = token
 
     return res.status(200).send({
       id: user.id,
@@ -225,7 +225,7 @@ const sendEmail = async (req, res) => {
 const qrCode = async (req, res) => {
   QRCode.toFile(
     'app/qrcode/' + 'haha' + 'filename.png',
-    'http://10.13.3.110:3306',
+    'http://10.13.3.110:3000',
     {
       color: {
         dark: '#000', // Black Dots
