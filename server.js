@@ -14,7 +14,8 @@ import socketHandler from './socketHandler.js'
 const whitelist = [
   'http://localhost:3000',
   'http://localhost:3001',
-  'http://localhost:3080',
+  'http://localhost:3080/',
+  'http://127.0.0.1:3080',
 ]
 
 const app = express()
@@ -66,7 +67,7 @@ app.get('/express_backend', (req, res) => {
 db.sequelize.sync().then(() => {
   console.log('Sync db.')
   //initial() //please uncommend at first initialize
-  //mockedLuckyDrawData() // mocked data for testing lucky draw
+  // mockedLuckyDrawData() // mocked data for testing lucky draw
 })
 
 function initial() {
@@ -127,7 +128,7 @@ async function mockedLuckyDrawData() {
   }
 }
 
-;(async () => {
+; (async () => {
   const pubClient = createClient({ url: 'redis://localhost:6379' }) // Add your Redis URL here
   const subClient = pubClient.duplicate()
 

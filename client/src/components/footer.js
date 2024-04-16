@@ -14,7 +14,10 @@ import HBLogo from "../assets/HBLogo.png"
 
 const Logo = (props) => {
   return (
-    <img src={HBLogo} alt="" width="100" height="100" />
+    <div class="footerImgBox">
+      <img src={HBLogo} alt="" height="auto" width="100" id="footer-image-logo" />
+    </div>
+
   );
 };
 
@@ -47,7 +50,7 @@ export default function SmallWithLogoLeft() {
     <Box
       bg={useColorModeValue("gray.50", "gray.900")}
       color={useColorModeValue("gray.700", "gray.200")}
-      position={"fixed"}
+      position={"relative"}
       width={"100%"}
       bottom={0}
     >

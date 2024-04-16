@@ -83,6 +83,22 @@ const luckyDraw = async (req, res) => {
   res.status(result.error ? 200 : 500).json(result)
 }
 
+const create = () => {
+
+}
+const _delete = () => {
+
+}
+const edit = () => {
+
+}
+const view = () => {
+
+}
 export default {
   luckyDraw,
+  create,
+  _delete,
+  edit,
+  view
 }

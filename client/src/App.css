@@ -7,9 +7,32 @@
   pointer-events: none;
 }
 
+.roomCard {
+  height: 100px;
+  width: 300px;
+  box-shadow: 1px 1px 10px -5px rgb(0, 0, 0);
+  border-radius: 10px;
+  justify-content: center;
+  justify-items: center;
+}
+.roomText {
+  align-items: "center";
+  justify-content: "center";
+}
+.spankBtn {
+  width: 500px;
+  height: 500px;
+  border-radius: 200px;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
+  }
+  .spankBtn {
+    width: 300px;
+    height: 300px;
+    border-radius: 100px;
   }
 }
 
@@ -34,5 +57,16 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media only screen and (max-width: 450px) {
+  #footer-image-logo {
+    width: 50px;
+    height: auto;
+  }
+
+  .footerImgBox {
+    max-width: 100px;
   }
 }

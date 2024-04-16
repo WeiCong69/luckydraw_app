@@ -30,6 +30,8 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../redux/actions/auth";
+import HBLogo2 from "../assets/HBLogo2.svg"
+
 
 // let nav_user = [];
 export default function WithSubnavigation() {
@@ -45,55 +47,60 @@ export default function WithSubnavigation() {
   const navigate = useNavigate();
   const handleLogout = async () => {
     await dispatch(logout());
-    navigate("/");
+    navigate("/login");
   };
-  const nav_items = user?.role === 3
+  console.log("user", user)
+  const nav_items = user?.roles === 3
     ? [
-        {
-          label: "Inspiration",
-          children: [
-            {
-              label: "Explore Design Work",
-              subLabel: "Trending Design to inspire you",
-              href: "#",
-            },
-            {
-              label: "New & Noteworthy",
-              subLabel: "Up-and-coming Designers",
-              href: "#",
-            },
-          ],
-        },
-        {
-          label: "Find Work",
-          children: [
-            {
-              label: "Job Board",
-              subLabel: "Find your dream design job",
-              href: "#",
-            },
-            {
-              label: "Freelance Projects",
-              subLabel: "An exclusive list for contract work",
-              href: "#",
-            },
-          ],
-        },
-        {
-          label: "Forms",
-          href: "/form_g1",
-        },
-        {
-          label: "User List",
-          href: "/user/list",
-        },
-      ]
+      // {
+      //   label: "Inspiration",
+      //   children: [
+      //     {
+      //       label: "Explore Design Work",
+      //       subLabel: "Trending Design to inspire you",
+      //       href: "#",
+      //     },
+      //     {
+      //       label: "New & Noteworthy",
+      //       subLabel: "Up-and-coming Designers",
+      //       href: "#",
+      //     },
+      //   ],
+      // },
+      // {
+      //   label: "Find Work",
+      //   children: [
+      //     {
+      //       label: "Job Board",
+      //       subLabel: "Find your dream design job",
+      //       href: "#",
+      //     },
+      //     {
+      //       label: "Freelance Projects",
+      //       subLabel: "An exclusive list for contract work",
+      //       href: "#",
+      //     },
+      //   ],
+      // },
+      // {
+      //   label: "Forms",
+      //   href: "/form_g1",
+      // },
+      {
+        label: "User List",
+        href: "/user/list",
+      },
+      {
+        label: "Rooms",
+        href: "/user/room",
+      },
+    ]
     : [
-        {
-          label: "Forms",
-          href: "/form_g1",
-        },
-      ];
+      {
+        label: "Rooms",
+        href: "/user/room",
+      },
+    ];
   return (
     <Box>
       <Flex
@@ -125,15 +132,9 @@ export default function WithSubnavigation() {
             aria-label={"Toggle Navigation"}
           />
         </Flex>
-        <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
+        <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }} alignItems={"center"}>
           <Link href="/">
-            <Text
-              textAlign={useBreakpointValue({ base: "center", md: "left" })}
-              fontFamily={"heading"}
-              color={useColorModeValue("gray.800", "white")}
-            >
-              Logo
-            </Text>
+            <img src={HBLogo2} alt="" width="50" height="50" />
           </Link>
           <Flex display={{ base: "none", md: "flex" }} ml={10}>
             <DesktopNav navItems={nav_items} />
