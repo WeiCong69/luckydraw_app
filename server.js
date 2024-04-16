@@ -9,6 +9,7 @@ import authRoute from './app/routes/auth.route.js'
 import userRoute from './app/routes/user.route.js'
 import cookieSession from 'cookie-session'
 import giftRoute from './app/routes/gift.route.js'
+import roomRoute from './app/routes/room.route.js'
 import socketHandler from './socketHandler.js'
 
 const whitelist = [
@@ -54,6 +55,7 @@ app.use(
 authRoute(app)
 userRoute(app)
 giftRoute(app)
+roomRoute(app)
 
 app.get('/', cors(), (req, res) => {
   res.json({ message: 'Welcome to Best Application.' })
@@ -128,7 +130,7 @@ async function mockedLuckyDrawData() {
   }
 }
 
-; (async () => {
+;(async () => {
   const pubClient = createClient({ url: 'redis://localhost:6379' }) // Add your Redis URL here
   const subClient = pubClient.duplicate()
 
