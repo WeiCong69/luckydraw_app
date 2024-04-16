@@ -2,6 +2,7 @@ import LuckyDrawResponseDTO from '../DTOs/luckyDrawResponseDTO.js'
 import db from '../models/index.js'
 import Sequelize from 'sequelize'
 import { publishMessage, isAcknowledged } from '../../server.js'
+import historyController from './history.controller.js'
 
 const Gift = db.gifts
 
@@ -73,8 +74,19 @@ const luckyDraw = async (req, res) => {
   } else {
     result = await processLuckyDraw(req)
 
-    if (!result) {
-      // No gifts in prize pool
+    if (result && !result.error) {
+      try {
+
+        await historyController.create(
+          req.userId,
+          req.body.roomId,
+          result.gifts.dataValues.id
+        )
+      } catch (error) {
+        console.error('Error creating history record:', error)
+        result = new LuckyDrawResponseDTO({ error: 'Failed to record history' })
+      }
+    } else if (!result) {
       result = new LuckyDrawResponseDTO({ error: 'No gifts in prize pool.' })
     }
   }
@@ -83,22 +95,14 @@ const luckyDraw = async (req, res) => {
   res.status(result.error ? 200 : 500).json(result)
 }
 
-const create = () => {
-
-}
-const _delete = () => {
-
-}
-const edit = () => {
-
-}
-const view = () => {
-
-}
+const create = () => {}
+const _delete = () => {}
+const edit = () => {}
+const view = () => {}
 export default {
   luckyDraw,
   create,
   _delete,
   edit,
-  view
+  view,
 }

@@ -12,6 +12,7 @@ import userDetails from './userDetails.model.js'
 import role from './role.model.js'
 import gift from './gift.model.js'
 import room from './room.model.js'
+import history from './history.model.js'
 
 const Op = Sequelize.Op
 const sequelize = new Sequelize(DB, USER, PASSWORD, {
@@ -37,11 +38,21 @@ db.userDetails = userDetails(sequelize, Sequelize)
 db.role = role(sequelize, Sequelize)
 db.rooms = room(sequelize, Sequelize)
 db.gifts = gift(sequelize, Sequelize)
+db.history = history(sequelize, Sequelize)
 
 db.users.hasMany(db.role)
 db.users.hasOne(db.userDetails)
 
 db.rooms.hasMany(db.gifts)
+
+db.users.hasMany(db.history)
+db.history.belongsTo(db.users)
+
+db.rooms.hasMany(db.history)
+db.history.belongsTo(db.rooms)
+
+db.gifts.hasMany(db.history)
+db.history.belongsTo(db.gifts)
 
 db.ROLES = ['user', 'admin', 'moderator']
 

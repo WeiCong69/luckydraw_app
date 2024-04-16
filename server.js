@@ -11,6 +11,7 @@ import cookieSession from 'cookie-session'
 import giftRoute from './app/routes/gift.route.js'
 import roomRoute from './app/routes/room.route.js'
 import socketHandler from './socketHandler.js'
+import historyRoute from './app/routes/history.route.js'
 
 const whitelist = [
   'http://localhost:3000',
@@ -56,6 +57,7 @@ authRoute(app)
 userRoute(app)
 giftRoute(app)
 roomRoute(app)
+historyRoute(app)
 
 app.get('/', cors(), (req, res) => {
   res.json({ message: 'Welcome to Best Application.' })
