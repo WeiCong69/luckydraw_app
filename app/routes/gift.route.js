@@ -8,11 +8,33 @@ export default function (app) {
     next()
   })
 
-
   app.post(
     '/api/gift/luckyDraw',
     [middleware.authJwt.verifyToken, middleware.authJwt.isUser],
     gift.luckyDraw
   )
 
+  app.post(
+    '/api/gift/create',
+    [middleware.authJwt.verifyToken, middleware.authJwt.isAdmin],
+    gift.create
+  )
+
+  app.get(
+    '/api/gift/getAllByRoom',
+    [middleware.authJwt.verifyToken, middleware.authJwt.isAdmin],
+    gift.getAllGifts
+  )
+
+  app.put(
+    '/api/gift/edit/:id',
+    [middleware.authJwt.verifyToken, middleware.authJwt.isAdmin],
+    gift.edit
+  )
+
+  app.delete(
+    '/api/gift/delete/:id',
+    [middleware.authJwt.verifyToken, middleware.authJwt.isAdmin],
+    gift._delete
+  )
 }

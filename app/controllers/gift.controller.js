@@ -26,37 +26,14 @@ const processLuckyDraw = async (req) => {
     const gifts = await performLuckyDraw(req.body.roomId)
 
     if (gifts) {
-      const totalLikelihood = gifts.reduce(
-        (acc, gift) => acc + gift.likelihood,
-        0
-      )
-      const randomNumber = Math.random() * totalLikelihood
+      const randomIndex = Math.floor(Math.random() * gifts.length)
+      const selectedGift = gifts[randomIndex]
 
-      const selectedGift = gifts.reduce(
-        (acc, gift) => {
-          if (
-            !acc.selectedGift &&
-            randomNumber <= acc.cumulativeProbability + gift.likelihood
-          ) {
-            return {
-              cumulativeProbability:
-                acc.cumulativeProbability + gift.likelihood,
-              selectedGift: gift,
-            }
-          }
-          return acc
-        },
-        { cumulativeProbability: 0, selectedGift: null }
-      ).selectedGift
+      await updateGiftQuantity(selectedGift)
 
-      if (selectedGift) {
-        await updateGiftQuantity(selectedGift)
-        return new LuckyDrawResponseDTO({ gifts: selectedGift })
-      } else {
-        return new LuckyDrawResponseDTO({ error: 'Better luck next time!' })
-      }
+      return new LuckyDrawResponseDTO({ gifts: selectedGift })
     } else {
-      return null // No gifts in prize pool
+      return new LuckyDrawResponseDTO({ error: 'No gifts in prize pool.' })
     }
   } catch (error) {
     console.error('Error during lucky draw:', error)
@@ -74,9 +51,9 @@ const luckyDraw = async (req, res) => {
   } else {
     result = await processLuckyDraw(req)
 
+    console.log('hiiiiiiiiiiiiiiiiiiiiiiiiiiiii', result.gifts.dataValues.id)
     if (result && !result.error) {
       try {
-
         await historyController.create(
           req.userId,
           req.body.roomId,
@@ -95,14 +72,64 @@ const luckyDraw = async (req, res) => {
   res.status(result.error ? 200 : 500).json(result)
 }
 
-const create = () => {}
-const _delete = () => {}
-const edit = () => {}
-const view = () => {}
+const create = async (req, res) => {
+  try {
+    const gift = await Gift.create(req.body)
+    res.status(201).json(gift)
+  } catch (error) {
+    console.error('Error creating gift:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+}
+const _delete = async (req, res) => {
+  try {
+    const rowsDeleted = await Gift.destroy({ where: { id: req.params.id } })
+    if (rowsDeleted === 0) {
+      res.status(404).json({ error: 'Gift not found' })
+    } else {
+      res.status(204).end()
+    }
+  } catch (error) {
+    console.error('Error deleting gift:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+}
+
+const edit = async (req, res) => {
+  try {
+    const [rowsUpdated, updatedGift] = await Gift.update(req.body, {
+      where: { id: req.params.id },
+      returning: true,
+    })
+    if (rowsUpdated === 0) {
+      res.status(404).json({ error: 'Gift not found' })
+    } else {
+      res.json(updatedGift[0])
+    }
+  } catch (error) {
+    console.error('Error updating gift:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+}
+const getAllGifts = async (req, res) => {
+  try {
+    let gifts
+    if (req.query.roomId) {
+      gifts = await Gift.findAll({ where: { roomId: req.query.roomId } })
+    } else {
+      gifts = await Gift.findAll()
+    }
+    res.json(gifts)
+  } catch (error) {
+    console.error('Error fetching gifts:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+}
+
 export default {
   luckyDraw,
   create,
   _delete,
   edit,
-  view,
+  getAllGifts,
 }

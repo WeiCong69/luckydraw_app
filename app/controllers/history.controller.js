@@ -23,7 +23,6 @@ const edit = async (req, res) => {
 
 const view = async (req, res) => {
   try {
-    // Extract roomId and userId from the request body
     const { roomId, userId } = req.body
 
     let whereCondition = {}
