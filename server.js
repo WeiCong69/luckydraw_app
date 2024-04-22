@@ -133,7 +133,15 @@ async function mockedLuckyDrawData() {
 }
 
 ;(async () => {
-  const pubClient = createClient({ url: 'redis://localhost:6379' }) // Add your Redis URL here
+  const pubClient = createClient({
+    username: process.env.REDIS_USER,
+    password: process.env.REDIS_PASS,
+    socket: {
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
+      tls: true,
+    },
+  }) // Add your Redis URL here
   const subClient = pubClient.duplicate()
 
   await Promise.all([pubClient.connect(), subClient.connect()])
