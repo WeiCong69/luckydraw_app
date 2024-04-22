@@ -18,6 +18,7 @@ const whitelist = [
   'http://localhost:3001',
   'http://localhost:3080/',
   'http://127.0.0.1:3080',
+  process.env.ip,
 ]
 
 const app = express()
