@@ -139,6 +139,7 @@ async function mockedLuckyDrawData() {
     socket: {
       host: process.env.REDIS_HOST,
       port: process.env.REDIS_PORT,
+      tls: true,
     },
   }) // Add your Redis URL here
   const subClient = pubClient.duplicate()
