@@ -16,25 +16,25 @@ export default function (app) {
 
   app.post(
     '/api/gift/create',
-    [middleware.authJwt.verifyToken, middleware.authJwt.isAdmin],
-    gift.create
+    [middleware.authJwt.verifyToken, middleware.authJwt.isAdminOrUser],
+    gift.createOrEdit
   )
 
-  app.get(
+  app.post(
     '/api/gift/getAllByRoom',
-    [middleware.authJwt.verifyToken, middleware.authJwt.isAdmin],
+    [middleware.authJwt.verifyToken, middleware.authJwt.isAdminOrUser],
     gift.getAllGifts
   )
 
-  app.put(
-    '/api/gift/edit/:id',
-    [middleware.authJwt.verifyToken, middleware.authJwt.isAdmin],
-    gift.edit
+  app.post(
+    '/api/gift/edit',
+    [middleware.authJwt.verifyToken, middleware.authJwt.isAdminOrUser],
+    gift.createOrEdit
   )
 
-  app.delete(
-    '/api/gift/delete/:id',
-    [middleware.authJwt.verifyToken, middleware.authJwt.isAdmin],
+  app.post(
+    '/api/gift/delete',
+    [middleware.authJwt.verifyToken, middleware.authJwt.isAdminOrUser],
     gift._delete
   )
 }

@@ -14,7 +14,7 @@ import HBLogo from "../assets/HBLogo.png"
 
 const Logo = (props) => {
   return (
-    <div class="footerImgBox">
+    <div className="footerImgBox">
       <img src={HBLogo} alt="" height="auto" width="100" id="footer-image-logo" />
     </div>
 

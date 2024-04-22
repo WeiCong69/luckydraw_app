@@ -95,11 +95,30 @@ async function isModeratorOrAdmin(req, res, next) {
   }
 }
 
+async function isAdminOrUser(req, res, next) {
+  try {
+    const user = await User.findByPk(req.userId)
+    const role = await user.roleId
+    if (role === 1 || role === 3) {
+      return next()
+    }
+
+    return res.status(403).send({
+      message: 'Require Moderator or Admin Role!',
+    })
+  } catch (error) {
+    return res.status(500).send({
+      message: 'Unable to validate Moderator or Admin role!',
+    })
+  }
+}
+
 const authJwt = {
   verifyToken,
   isUser,
   isAdmin,
   isModerator,
   isModeratorOrAdmin,
+  isAdminOrUser,
 }
 export default authJwt
