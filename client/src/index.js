@@ -24,19 +24,19 @@ const colors = {
 const theme = extendTheme({ colors });
 
 root.render(
-  <React.StrictMode>
-    <ChakraProvider theme={theme}>
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <Router>
-            <Navbar />
-              <App />
-            <Footer />
-          </Router>
-        </PersistGate>
-      </Provider>
-    </ChakraProvider>
-  </React.StrictMode>
+  // <React.StrictMode>
+  <ChakraProvider theme={theme}>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <Router>
+          <Navbar />
+          <App />
+          <Footer />
+        </Router>
+      </PersistGate>
+    </Provider>
+  </ChakraProvider>
+  // </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -49,7 +49,6 @@ export default function WithSubnavigation() {
     await dispatch(logout());
     navigate("/login");
   };
-  console.log("user", user)
   const nav_items = user?.roles === 3
     ? [
       // {

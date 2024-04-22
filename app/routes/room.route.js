@@ -16,18 +16,18 @@ export default function (app) {
 
   app.get(
     '/api/room/all',
-    [middleware.authJwt.verifyToken, middleware.authJwt.isAdmin],
+    [middleware.authJwt.verifyToken, middleware.authJwt.isAdminOrUser],
     room.view
   )
 
-  app.put(
-    '/api/room/edit/:id',
+  app.post(
+    '/api/room/edit',
     [middleware.authJwt.verifyToken, middleware.authJwt.isAdmin],
     room.edit
   )
 
-  app.delete(
-    '/api/room/delete/:id',
+  app.post(
+    '/api/room/delete',
     [middleware.authJwt.verifyToken, middleware.authJwt.isAdmin],
     room._delete
   )

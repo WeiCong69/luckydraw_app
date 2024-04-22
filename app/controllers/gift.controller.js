@@ -75,19 +75,22 @@ const luckyDraw = async (req, res) => {
 const create = async (req, res) => {
   try {
     const gift = await Gift.create(req.body)
-    res.status(201).json(gift)
+    res.status(200).json(gift)
   } catch (error) {
     console.error('Error creating gift:', error)
     res.status(500).json({ error: 'Internal server error' })
   }
 }
 const _delete = async (req, res) => {
+  console.log("req", req.body)
   try {
-    const rowsDeleted = await Gift.destroy({ where: { id: req.params.id } })
+    const rowsDeleted = await Gift.destroy({ where: { id: req.body.id } }).then().catch(err => console.log(err))
     if (rowsDeleted === 0) {
       res.status(404).json({ error: 'Gift not found' })
     } else {
-      res.status(204).end()
+      res.status(200).send({
+        message: "Delete Successfully",
+      })
     }
   } catch (error) {
     console.error('Error deleting gift:', error)
@@ -95,27 +98,36 @@ const _delete = async (req, res) => {
   }
 }
 
-const edit = async (req, res) => {
+const createOrEdit = async (req, res) => {
+  let data = req.body;
+  const gifts = data?.gifts;
+
+  if (!gifts || !Array.isArray(gifts)) {
+    return res.status(400).json({ error: 'Invalid or missing gifts data' });
+  }
+  const sanitizedGifts = gifts.map(gift => {
+    const { id, ...sanitizedGift } = gift;
+    return sanitizedGift;
+  });
+
   try {
-    const [rowsUpdated, updatedGift] = await Gift.update(req.body, {
-      where: { id: req.params.id },
-      returning: true,
-    })
-    if (rowsUpdated === 0) {
-      res.status(404).json({ error: 'Gift not found' })
-    } else {
-      res.json(updatedGift[0])
-    }
+    const insertUpdateOptions = {
+      updateOnDuplicate: ['name', 'quantity', 'likelihood', 'roomId'], // Specify the fields to update
+    };
+    await Gift.bulkCreate(gifts, insertUpdateOptions);
+    res.status(200).send({
+      message: "Gifts saved successfully",
+    });
   } catch (error) {
-    console.error('Error updating gift:', error)
-    res.status(500).json({ error: 'Internal server error' })
+    console.error('Error upserting gifts:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 }
 const getAllGifts = async (req, res) => {
   try {
     let gifts
-    if (req.query.roomId) {
-      gifts = await Gift.findAll({ where: { roomId: req.query.roomId } })
+    if (req.body.roomId) {
+      gifts = await Gift.findAll({ where: { roomId: req.body.roomId } })
     } else {
       gifts = await Gift.findAll()
     }
@@ -130,6 +142,6 @@ export default {
   luckyDraw,
   create,
   _delete,
-  edit,
+  createOrEdit,
   getAllGifts,
 }
